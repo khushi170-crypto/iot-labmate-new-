@@ -20,7 +20,15 @@ const FILTERS: Array<{ value: BookingStatus | "ALL"; label: string }> = [
   { value: "RETURNED", label: BOOKING_STATUS_META.RETURNED.label },
 ];
 
-export function StudentBookings({ bookings, currency }: { bookings: BookingView[]; currency: string }) {
+export function StudentBookings({
+  bookings,
+  currency,
+  paymentsEnabled = false,
+}: {
+  bookings: BookingView[];
+  currency: string;
+  paymentsEnabled?: boolean;
+}) {
   const router = useRouter();
   const [filter, setFilter] = useState<BookingStatus | "ALL">("ALL");
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +86,8 @@ export function StudentBookings({ bookings, currency }: { bookings: BookingView[
               key={booking.id}
               booking={booking}
               currency={currency}
+              canPay
+              paymentsEnabled={paymentsEnabled}
               actions={
                 booking.status === "PENDING" ? (
                   <Button

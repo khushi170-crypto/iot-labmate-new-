@@ -18,6 +18,7 @@ const adapter = new PrismaBetterSqlite3({ url });
 const db = new PrismaClient({ adapter });
 
 async function main() {
+  await db.payment.deleteMany();
   await db.fine.deleteMany();
   await db.bookingItem.deleteMany();
   await db.booking.deleteMany();

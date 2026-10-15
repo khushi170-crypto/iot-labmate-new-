@@ -44,8 +44,9 @@ export async function listFines(opts: { studentId?: string; includeRelations?: b
       ? {
           booking: { include: { items: { include: { equipment: true } } } },
           student: { select: { id: true, name: true, email: true } },
+          payments: { orderBy: { createdAt: "desc" } },
         }
-      : { booking: true },
+      : { booking: true, payments: { orderBy: { createdAt: "desc" } } },
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
   });
 }

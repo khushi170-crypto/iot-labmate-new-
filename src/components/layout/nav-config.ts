@@ -24,6 +24,7 @@ export const STUDENT_NAV: NavItem[] = [
   { href: "/student/catalog", label: "Equipment", icon: PackageSearch },
   { href: "/student/kit-builder", label: "AI Kit Builder", icon: Sparkles },
   { href: "/student/bookings", label: "My Bookings", icon: CalendarCheck },
+  { href: "/student/fines", label: "My Fines", icon: HandCoins },
   { href: "/student/complaints", label: "Complaints", icon: MessageSquareWarning },
   { href: "/student/profile", label: "Profile", icon: UserRound },
 ];

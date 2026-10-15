@@ -31,6 +31,20 @@ export interface BookingItemView {
   conditionOnReturn: EquipmentCondition | null;
 }
 
+export interface PaymentView {
+  id: string;
+  orderId: string;
+  paymentId: string | null;
+  amount: number;
+  currency: string;
+  status: "CREATED" | "PAID" | "FAILED";
+  method: string | null;
+  gatewayStatus: string | null;
+  failureReason: string | null;
+  createdAt: DateLike;
+  verifiedAt: DateLike | null;
+}
+
 export interface FineView {
   id: string;
   amount: number;
@@ -39,6 +53,7 @@ export interface FineView {
   status: FineStatus;
   createdAt: DateLike;
   paidAt: DateLike | null;
+  payments?: PaymentView[];
 }
 
 export interface BookingView {

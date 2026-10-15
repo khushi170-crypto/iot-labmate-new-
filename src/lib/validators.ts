@@ -80,6 +80,17 @@ export const kitBuilderSchema = z.object({
   maxItems: z.coerce.number().int().min(1).max(30).optional(),
 });
 
+export const createPaymentOrderSchema = z.object({
+  fineId: z.string().min(1, "A fine is required"),
+});
+
+export const verifyPaymentSchema = z.object({
+  fineId: z.string().min(1, "A fine is required"),
+  razorpay_order_id: z.string().min(1, "Missing Razorpay order id"),
+  razorpay_payment_id: z.string().min(1, "Missing Razorpay payment id"),
+  razorpay_signature: z.string().min(1, "Missing Razorpay signature"),
+});
+
 export type CreateEquipmentInput = z.infer<typeof createEquipmentSchema>;
 export type UpdateEquipmentInput = z.infer<typeof updateEquipmentSchema>;
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
@@ -88,3 +99,5 @@ export type ComplaintInput = z.infer<typeof complaintSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;
 export type KitBuilderInput = z.infer<typeof kitBuilderSchema>;
+export type CreatePaymentOrderInput = z.infer<typeof createPaymentOrderSchema>;
+export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;

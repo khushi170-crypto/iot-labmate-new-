@@ -41,6 +41,12 @@ enum ComplaintStatus {
   RESOLVED
 }
 
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -56,6 +62,7 @@ model User {
   complaints  Complaint[]
   approved    Booking[]     @relation("BookingApproval")
   handled     Complaint[]   @relation("ComplaintHandling")
+  payments    Payment[]
 }
 
 model Category {
@@ -131,6 +138,27 @@ model Fine {
 
   booking Booking @relation(fields: [bookingId], references: [id])
   student User   @relation(fields: [studentId], references: [id])
+  payments Payment[]
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  fineId     String
+  studentId  String
+  orderId    String        @unique
+  paymentId  String?       @unique
+  signature  String?
+  amount     Float
+  currency   String
+  status     PaymentStatus @default(CREATED)
+  method     String?
+  gatewayStatus String?
+  failureReason String?
+  createdAt  DateTime      @default(now())
+  verifiedAt DateTime?
+
+  fine    Fine @relation(fields: [fineId], references: [id])
+  student User @relation(fields: [studentId], references: [id])
 }
 
 model Complaint {

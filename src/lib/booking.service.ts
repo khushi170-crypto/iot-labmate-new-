@@ -46,7 +46,7 @@ export async function listStudentBookings(studentId: string) {
     where: { studentId },
     include: {
       items: { include: { equipment: { include: { category: true } } } },
-      fine: true,
+      fine: { include: { payments: { orderBy: { createdAt: "desc" } } } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -66,7 +66,7 @@ export async function listBookings(opts: { status?: BookingStatus; search?: stri
     include: {
       student: { select: { id: true, name: true, email: true } },
       items: { include: { equipment: { include: { category: true } } } },
-      fine: true,
+      fine: { include: { payments: { orderBy: { createdAt: "desc" } } } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -78,7 +78,7 @@ export async function getBooking(id: string) {
     include: {
       student: { select: { id: true, name: true, email: true } },
       items: { include: { equipment: { include: { category: true } } } },
-      fine: true,
+      fine: { include: { payments: { orderBy: { createdAt: "desc" } } } },
     },
   });
 }

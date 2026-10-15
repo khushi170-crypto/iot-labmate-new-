@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StudentBookings } from "@/components/bookings/student-bookings";
 import { requireUser } from "@/lib/session";
 import { listStudentBookings } from "@/lib/booking.service";
+import { onlinePaymentsEnabled } from "@/lib/payments.service";
 import { getCurrency } from "@/lib/settings.service";
 import type { BookingView } from "@/lib/types";
 
@@ -17,7 +18,11 @@ export default async function StudentBookingsPage() {
         title="My bookings"
         description="Track the status of every equipment request and loan."
       />
-      <StudentBookings bookings={bookings as unknown as BookingView[]} currency={currency} />
+      <StudentBookings
+        bookings={bookings as unknown as BookingView[]}
+        currency={currency}
+        paymentsEnabled={onlinePaymentsEnabled()}
+      />
     </div>
   );
 }

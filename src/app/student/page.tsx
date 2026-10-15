@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/session";
 import { listStudentBookings } from "@/lib/booking.service";
 import { listFines } from "@/lib/fines.service";
+import { onlinePaymentsEnabled } from "@/lib/payments.service";
 import { listStudentComplaints } from "@/lib/complaint.service";
 import { getCurrency } from "@/lib/settings.service";
 import type { BookingView } from "@/lib/types";
@@ -23,9 +24,11 @@ export default async function StudentDashboardPage() {
     getCurrency(),
   ]);
 
+  const paymentsEnabled = onlinePaymentsEnabled();
   const active = bookings.filter((b) => b.status === "ISSUED" || b.status === "OVERDUE");
   const pending = bookings.filter((b) => b.status === "PENDING");
-  const unpaid = fines.filter((f) => f.status === "UNPAID").reduce((sum, f) => sum + f.amount, 0);
+  const unpaidFines = fines.filter((f) => f.status === "UNPAID");
+  const unpaid = unpaidFines.reduce((sum, f) => sum + f.amount, 0);
   const openComplaints = complaints.filter((c) => c.status === "OPEN" || c.status === "IN_REVIEW");
   const recent = (bookings as unknown as BookingView[]).slice(0, 3);
 
@@ -39,7 +42,19 @@ export default async function StudentDashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Active loans" value={active.length} icon={CalendarCheck} tone="neon" />
         <StatCard label="Pending requests" value={pending.length} icon={PackageSearch} tone="warning" />
-        <StatCard label="Unpaid fines" value={`${currency}${unpaid.toFixed(2)}`} icon={HandCoins} tone="danger" />
+        {unpaid > 0 ? (
+          <Link href="/student/fines" className="block transition hover:opacity-90">
+            <StatCard
+              label="Unpaid fines"
+              value={`${currency}${unpaid.toFixed(2)}`}
+              icon={HandCoins}
+              tone="danger"
+              hint={`${unpaidFines.length} fine(s) · tap to pay online`}
+            />
+          </Link>
+        ) : (
+          <StatCard label="Unpaid fines" value={`${currency}${unpaid.toFixed(2)}`} icon={HandCoins} tone="danger" />
+        )}
         <StatCard label="Open complaints" value={openComplaints.length} icon={MessageSquareWarning} tone="violet" />
       </div>
 
@@ -80,7 +95,13 @@ export default async function StudentDashboardPage() {
         ) : (
           <div className="space-y-4">
             {recent.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} currency={currency} />
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                currency={currency}
+                canPay
+                paymentsEnabled={paymentsEnabled}
+              />
             ))}
           </div>
         )}
