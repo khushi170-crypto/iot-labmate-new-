@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  STUDENT
+  LAB_ASSISTANT
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ISSUED
+  RETURNED
+  OVERDUE
+  CANCELLED
+}
+
+enum EquipmentCondition {
+  NEW
+  GOOD
+  FAIR
+  DAMAGED
+}
+
+enum FineStatus {
+  UNPAID
+  PAID
+  WAIVED
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings    Booking[]
+  fines       Fine[]
+  complaints  Complaint[]
+  approved    Booking[]     @relation("BookingApproval")
+  handled     Complaint[]   @relation("ComplaintHandling")
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+
+  equipment Equipment[]
+}
+
+model Equipment {
+  id           String             @id @default(cuid())
+  name         String
+  categoryId   String
+  description  String?
+  imageUrl     String?
+  totalQty     Int                @default(1)
+  availableQty Int                @default(1)
+  condition    EquipmentCondition @default(GOOD)
+  isActive     Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  category Category     @relation(fields: [categoryId], references: [id])
+  items    BookingItem[]
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  code         String        @unique
+  studentId    String
+  status       BookingStatus @default(PENDING)
+  notes        String?
+  requestedAt  DateTime      @default(now())
+  approvedAt   DateTime?
+  approvedById String?
+  issuedAt     DateTime?
+  dueAt        DateTime?
+  returnedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  student    User          @relation(fields: [studentId], references: [id])
+  approvedBy User?         @relation("BookingApproval", fields: [approvedById], references: [id])
+  items      BookingItem[]
+  fine       Fine?
+}
+
+model BookingItem {
+  id                String             @id @default(cuid())
+  bookingId         String
+  equipmentId       String
+  quantity          Int
+  conditionOnIssue  EquipmentCondition?
+  conditionOnReturn EquipmentCondition?
+
+  booking   Booking   @relation(fields: [bookingId], references: [id])
+  equipment Equipment @relation(fields: [equipmentId], references: [id])
+}
+
+model Fine {
+  id          String     @id @default(cuid())
+  bookingId   String     @unique
+  studentId   String
+  amount      Float
+  daysLate    Int
+  rateApplied Float
+  status      FineStatus @default(UNPAID)
+  note        String?
+  createdAt   DateTime   @default(now())
+  paidAt      DateTime?
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  student User   @relation(fields: [studentId], references: [id])
+}
+
+model Complaint {
+  id             String          @id @default(cuid())
+  studentId      String
+  subject        String
+  message        String
+  status         ComplaintStatus @default(OPEN)
+  resolutionNote String?
+  handledById    String?
+  createdAt      DateTime        @default(now())
+  resolvedAt     DateTime?
+
+  student   User   @relation(fields: [studentId], references: [id])
+  handledBy User?  @relation("ComplaintHandling", fields: [handledById], references: [id])
+}
+
+model AppSetting {
+  key   String @id
+  value String
+}
